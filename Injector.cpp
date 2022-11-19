@@ -66,7 +66,7 @@ int InjectDLL(DWORD PID, char* dll);
     if (!WriteProcessMemory(handleToProc, baseAddr, dll,  dllLength, NULL))
         return -1;
   
-    remThread = CreateRemoteThread(handleToProc, NULL, NULL)
+    remThread = CreateRemoteThread(handleToProc, NULL, NULL) //здесь нужно дописать 
   
   
   
