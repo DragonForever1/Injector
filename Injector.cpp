@@ -63,22 +63,42 @@ int InjectDLL(DWORD PID, char* dll);
         return -1;
   
   
-    if (!WriteProcessMemory(handleToProc, baseAddr, dll,  dllLength, NULL))
+    if (!WriteProcessMemory(handleToProc,baseAddr, dll, dllLength, NULL))
+  
+    remThread = CreateRemoteThread(handleToProc, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibAddr, baseAddr, 0, NULL); //здесь нужно дописать 
+    
+    if (!remThread)
+    return -1;
+    
+    WairForSingleObject(remThread, INFINITE);
+    
+    VirtualFreeEx(handleToProc, baseAddr, dllLength, MEM_RELEASE);
+    
+    if (CloseHandle(remThread) == 0 )
+    {
+        cout << "Failed To close handle to remote thread\n";
         return -1;
-  
-    remThread = CreateRemoteThread(handleToProc, NULL, NULL) //здесь нужно дописать 
-  
-  
+    }    
+    if (CloseHandle(handleToProc) == 0)
+    {
+        cout << "Failed to close handle to target process\n";
+        return -1;
+    }    
   
 }  
 
 int main ()
 {
-    system("Injector");
+    SetConsoleTitle("Injector");
     
     int PID = -1;
     char* dll = new char [255];
   
     getDLLpath(dll);
     getPID(&PID);
+    
+    InjectDLL(PID, dll);
+    system ("pause");
+    
+    return 0;
 }
